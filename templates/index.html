@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block app_content%}
+    <div class="section" id="mod-stats">
+    <div class="header h2">Early Alpha: Features to Come</div>
+      <div class="content">
+         <ul>
+           <li> Sortable Best Scores
+           <li> More Score Info
+           <li> More Map Info
+           <li> Scatter plot of all scores by mod
+         </ul>
+      </div>
+    <div class="header h2">Early Alpha: List of Avaliable Users</div>
+    <div class="content">
+        {% for user in users %}
+        <div class="score">
+            <a href="/profile/{{user.id}}/"><span style="font-size: 1.25em;">{{user.name}}</span></a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

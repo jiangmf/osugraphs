@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static js_tags humanize %}
+{% block extra_head %}
+<script type="text/javascript" src="{% static 'js/canvasjs.min.js' %}"></script>
+<script type="text/javascript">
+    function intToString(value) {
+        var newValue = value;
+        if (value >= 1000) {
+            var suffixes = ["", "k", "m", "b","t"];
+            var suffixNum = Math.floor( (""+value).length/3 );
+            var shortValue = '';
+            for (var precision = 2; precision >= 1; precision--) {
+                shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+                var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+                if (dotLessShortValue.length <= 2) { break; }
+            }
+            if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+            newValue = shortValue+suffixes[suffixNum];
+        }
+        return newValue;
+    }
+    window.onload = function() {
+        var modDistribution = new CanvasJS.Chart("modDistribution", {
+          title: {
+              text: "Mod Distrubution ",
+              fontFamily: "Open Sans",
+          },
+          data: [{
+              type: "doughnut",
+              indexLabelPlacement: "outside",
+              startAngle: 90, //vary the angle here.
+              dataPoints: [{
+                  x: 10,
+                  y: {{num_nomod}},
+                  label: "No Mod",
+                  color: "#BCCF02"
+              }, {
+                  x: 20,
+                  y: {{num_dt}},
+                  label: "DT",
+                  color: "#73c5e1"
+              }, {
+                  x: 30,
+                  y: {{num_hd}},
+                  label: "HD",
+                  color: "#F6E97F"
+              }, {
+                  x: 40,
+                  y: {{num_hr}},
+                  label: "HR",
+                  color: "#eb65a0"
+              }, ]
+          }]
+        }); 
+        modDistribution.render();   
+        var modPerformance = new CanvasJS.Chart("modPerformance", {
+          title: {
+              text: "Mod Performance",
+              fontFamily: "Open Sans",
+          },
+          axisY: {
+              gridThickness: 0,
+          },
+          data: [
+              {
+                  dataPoints: [{
+                      x: 10,
+                      y: {{performance_nomod}},
+                      label: "No Mod",
+                      color: "#BCCF02"
+                  }, {
+                      x: 20,
+                      y: {{performance_dt}},
+                      label: "DT",
+                      color: "#73c5e1"
+                  }, {
+                      x: 30,
+                      y: {{performance_hd}},
+                      label: "HD",
+                      color: "#F6E97F"
+                  }, {
+                      x: 40,
+                      y: {{performance_hr}},
+                      label: "HR",
+                      color: "#eb65a0"
+                  }, ]
+              }
+          ]
+        }); 
+        modPerformance.render();    
+        var ppTimeSeries = new CanvasJS.Chart("ppTimeSeries", {
+            zoomEnabled: true,
+            panEnabled: true, 
+            title: {
+                fontFamily: "Open Sans",
+                text: "PP vs Rank",
+            },
+            axisX: {
+                gridThickness: 0,
+                valueFormatString: "MMM D H:mm",
+                zoomable: true,
+            },
+            axisY: {
+                includeZero: false,
+                gridThickness: 1,
+                gridColor: "#DDDDDD"
+            },
+            axisY2: {
+                includeZero: false,
+                gridThickness: 1,
+                gridColor: "#DDDDDD",
+                 labelFormatter: function ( e ) {
+                       return e.value.toString().substring(1);  
+                }
+            },
+            data: [{
+                type: "line",
+                color: "#73c5e1",
+                dataPoints: [ //array
+                    {% for datapoint in datapoints %}
+                        {x: {{datapoint.time|chart_date}},y: {{datapoint.pp_raw}} },
+                    {% endfor%}
+                ]
+            },
+            {
+                type: "line",
+                axisYType: "secondary",
+                color: "#eb65a0",
+                // toolTipContent: function (e) {
+                //     alert(e)
+                // },
+                dataPoints: [ //array
+                    {% for datapoint in datapoints %}
+                        {x: {{datapoint.time|chart_date}},y: -{{datapoint.pp_rank}} },
+                    {% endfor%}
+                ]
+            }]
+        }); 
+        ppTimeSeries.render();
+        var hitCountTimeSeries = new CanvasJS.Chart("hitCountTimeSeries", {
+            title: {
+                fontFamily: "Open Sans",
+                text: "Score vs Level",
+            },
+            axisX: {
+                gridThickness: 0,
+                valueFormatString: "MMM D H:mm",
+            },
+            axisY: {
+                includeZero: false,
+                gridThickness: 1,
+                gridColor: "#DDDDDD",
+                labelFormatter: function ( e ) {
+                       return intToString(e.value);  
+                }  
+            },
+            axisY2: {
+                includeZero: false,
+                gridThickness: 1,
+                gridColor: "#DDDDDD"
+            },
+            data: [{
+                type: "line",
+                color: "#73c5e1",
+                dataPoints: [ //array
+                    {% for datapoint in datapoints %}
+                        {x: {{datapoint.time|chart_date}},y: {{datapoint.total_score}} },
+                    {% endfor%}
+                ]
+            },
+            {
+                type: "line",
+                axisYType: "secondary",
+                color: "#eb65a0",
+                dataPoints: [ //array
+                    {% for datapoint in datapoints %}
+                        {x: {{datapoint.time|chart_date}},y: {{datapoint.level}} },
+                    {% endfor%}
+                ]
+            },]
+        }); 
+        hitCountTimeSeries.render();
+    }
+</script>
+{% endblock %}
+{% block app_content %}
+<div style='overflow:hidden'>
+    <div class="profile">
+        <img src="{{profile_picture}}"/>
+    </div>
+    <div class="name">
+        <div class="h1">{{user.name}}<img class="flag" src="{% static static_flag %}"></div>
+        <p><strong>Rank</strong> {{current.pp_rank|intcomma}}</p>
+        <p><strong>PP</strong> {{current.pp_raw|intcomma}}</p>
+    </div>
+</div>
+
+<div class="section" id="basic-stats">
+    <div class="header h2">Stats</div>
+    <div class="content">
+        <div class="c6-12">
+            <div><div class="half o"><strong>Ranked Score </strong></div><div class="half o">{{current.ranked_score|intcomma}}</div></div>
+            <div><div class="half e"><strong>Total Score  </strong></div><div class="half e">{{current.total_score|intcomma}}</div></div>
+            <div><div class="half o"><strong>Play Count   </strong></div><div class="half o">{{current.playcount|intcomma}}</div></div>
+            <div><div class="half e"><strong>Hit Accuracy </strong></div><div class="half e">{{current.accuracy|floatformat:3}}%</div></div>
+            <div><div class="half o"><strong>Momentum <i class="fa fa-question-circle"></i></strong></div><div class="half o">2,420</div></div>
+            
+            <div><div class="half e"><strong>Data Points  </strong></div><div class="half e">{{num_datapoints}}</div></div>
+            <div><div class="half o"><strong>Date Joined  </strong></div><div class="half o">{{date_joined}}</div></div>
+            <div><div class="half e"><strong>Last Updated </strong></div><div class="half e">{{last_updated}}</div></div>
+            
+        </div>
+        <div class="c6-12">
+            <div class="c6-12"></div>
+            <div class="c6-12"></div>
+        </div>
+    </div>
+</div>
+
+<div class="section" id="mod-stats">
+    <div class="header h2">Mods</div>
+    <div class="content">
+    <div class="small-graph-container">
+        <div id="modDistribution" style="height: 250px; width: 100%;"></div>
+    </div>
+    <div class="small-graph-container">
+        <div id="modPerformance" style="height: 250px; width: 100%;"></div>
+    </div>
+    </div>
+</div>
+
+<div class="section" id="mod-stats">
+    <div class="header h2">Charts</div>
+    <div class="content">
+        <div class="large-graph-container">
+            <div id="ppTimeSeries" style="height: 300px; width: 100%;"></div>
+        </div>
+        <div class="large-graph-container">
+            <div id="hitCountTimeSeries" style="height: 300px; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="section" id="mod-stats">
+    <div class="header h2">Scores</div>
+    <div class="content">
+        {% for score in scores %}
+        <div class="score">
+            <div class="pp">
+              <strong>{{score.pp|floatformat:1}}</strong>
+              <img src="{% static score.static_rank_png %}">
+            </div>
+            <div class="score-data">
+              <div class="song-info"><a href="https://osu.ppy.sh/b/{{score.map_info.beatmap_id}}">{{score.map_info.artist}} - {{score.map_info.title}}</a></div>
+              <div class="score-info">{{score.date}}</div>
+            </div>
+            <div class="mods">{{score.mods}}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock%}
