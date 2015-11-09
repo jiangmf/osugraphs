@@ -87,6 +87,15 @@ class MapInfo(models.Model):
     beatmap_id = models.IntegerField()
     artist = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
+    bpm = models.FloatField()
+    difficultyrating = models.FloatField()
+    diff_size = models.FloatField()
+    diff_overall = models.FloatField()
+    diff_approach = models.FloatField()
+    diff_drain = models.FloatField()
+    hit_length = models.FloatField()
+    version = models.CharField(max_length=255)
+
 
 def get_data(user_id=None):
     if not user_id:
@@ -134,15 +143,29 @@ def get_scores(user_id=None):
                 data = json.loads(response.readall().decode('utf-8'))[0]
                 map_info = MapInfo.objects.create(
                     beatmap_id=beatmap_id, 
-                    artist=data['artist'],
-                    title=data['title'])
+                    artist = data['artist'],
+                    title  = data['title'],
+                    bpm = data['bpm'],
+                    difficultyrating = data['difficultyrating'],
+                    diff_size = data['diff_size'],
+                    diff_overall =data['diff_overall'],
+                    diff_approach = data['diff_approach'],
+                    diff_drain = data['diff_drain'],
+                    hit_length = data['hit_length'],
+                    version = data['title'],
+                )
 
             score['map_info'] = map_info
             try:
                 score_obj = Score.objects.get(user=user, map_info=map_info)
                 print(score_obj.date)
-                print(score['date'])
-                if score_obj.date == score['date']:
+                print(score['date']) 
+                if (score_obj.date.year   == score['date'].year   and
+                    score_obj.date.month  == score['date'].month  and
+                    score_obj.date.day    == score['date'].day    and
+                    score_obj.date.hour   == score['date'].hour   and
+                    score_obj.date.minute == score['date'].minute and
+                    score_obj.date.second == score['date'].second) :
                     continue
                     print("SKIPPED CREATING SCORE")
                 else:

@@ -95,9 +95,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'osugraphs',
         'USER': 'postgres',
-        'PASSWORD': '359527497',
+        'PASSWORD': 'Rh!n0DB',
         'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'PORT': '5433',
     },
 }
 
