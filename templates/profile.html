@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static js_tags humanize %}
 {% block extra_head %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script type="text/javascript" src="{% static 'js/canvasjs.min.js' %}"></script>
 <script type="text/javascript">
     function intToString(value) {
@@ -182,12 +183,26 @@
         }); 
         hitCountTimeSeries.render();
     }
+
+    $(document).ready(function(){
+       $(".score").click(function() {
+        if($(this).next(".score-detail").is(":visible")){
+          $(this).removeClass("selected")
+          $(this).next("div").slideUp("fast");
+        } else {
+          $(".score").removeClass("selected")
+          $(".score-detail").slideUp("fast");
+          $(this).addClass("selected")
+          $(this).next(".score-detail").slideToggle("fast");
+        }
+      });
+    })
 </script>
 {% endblock %}
 {% block app_content %}
 <div style='overflow:hidden'>
     <div class="profile">
-        <img src="{{profile_picture}}"/>
+        <img src="{{profile_picture}}" />
     </div>
     <div class="name">
         <div class="h1">{{user.name}}<img class="flag" src="{% static static_flag %}"></div>
@@ -200,16 +215,32 @@
     <div class="header h2">Stats</div>
     <div class="content">
         <div class="c6-12">
-            <div><div class="half o"><strong>Ranked Score </strong></div><div class="half o">{{current.ranked_score|intcomma}}</div></div>
-            <div><div class="half e"><strong>Total Score  </strong></div><div class="half e">{{current.total_score|intcomma}}</div></div>
-            <div><div class="half o"><strong>Play Count   </strong></div><div class="half o">{{current.playcount|intcomma}}</div></div>
-            <div><div class="half e"><strong>Hit Accuracy </strong></div><div class="half e">{{current.accuracy|floatformat:3}}%</div></div>
-            <div><div class="half o"><strong>Momentum <i class="fa fa-question-circle"></i></strong></div><div class="half o">2,420</div></div>
-            
-            <div><div class="half e"><strong>Data Points  </strong></div><div class="half e">{{num_datapoints}}</div></div>
-            <div><div class="half o"><strong>Date Joined  </strong></div><div class="half o">{{date_joined}}</div></div>
-            <div><div class="half e"><strong>Last Updated </strong></div><div class="half e">{{last_updated}}</div></div>
-            
+            <div>
+                <div class="half o"><strong>Ranked Score </strong></div><div class="half o">{{current.ranked_score|intcomma}}</div>
+            </div>
+            <div>
+                <div class="half e"><strong>Total Score  </strong></div><div class="half e">{{current.total_score|intcomma}}</div>
+            </div>
+            <div>
+                <div class="half o"><strong>Play Count   </strong></div><div class="half o">{{current.playcount|intcomma}}</div>
+            </div>
+            <div>
+                <div class="half e"><strong>Hit Accuracy </strong></div><div class="half e">{{current.accuracy|floatformat:3}}%</div>
+            </div>
+            <div>
+                <div class="half o"><strong>Momentum <i class="fa fa-question-circle"></i></strong></div><div class="half o">2,420</div>
+            </div>
+
+            <div>
+                <div class="half e"><strong>Data Points  </strong></div><div class="half e">{{num_datapoints}}</div>
+            </div>
+            <div>
+                <div class="half o"><strong>Date Joined  </strong></div><div class="half o">{{date_joined}}</div>
+            </div>
+            <div>
+                <div class="half e"><strong>Last Updated </strong></div><div class="half e">{{last_updated}}</div>
+            </div>
+
         </div>
         <div class="c6-12">
             <div class="c6-12"></div>
@@ -221,12 +252,12 @@
 <div class="section" id="mod-stats">
     <div class="header h2">Mods</div>
     <div class="content">
-    <div class="small-graph-container">
-        <div id="modDistribution" style="height: 250px; width: 100%;"></div>
-    </div>
-    <div class="small-graph-container">
-        <div id="modPerformance" style="height: 250px; width: 100%;"></div>
-    </div>
+        <div class="small-graph-container">
+            <div id="modDistribution" style="height: 250px; width: 100%;"></div>
+        </div>
+        <div class="small-graph-container">
+            <div id="modPerformance" style="height: 250px; width: 100%;"></div>
+        </div>
     </div>
 </div>
 
@@ -245,19 +276,24 @@
 <div class="section" id="mod-stats">
     <div class="header h2">Scores</div>
     <div class="content">
-        {% for score in scores %}
+
+      {% for score in scores %}
         <div class="score">
             <div class="pp">
-              <strong>{{score.pp|floatformat:1}}</strong>
-              <img src="{% static score.static_rank_png %}">
+                <strong>{{score.pp|floatformat:1}}</strong>
+                <img src="{% static score.static_rank_png %}">
             </div>
             <div class="score-data">
-              <div class="song-info"><a href="https://osu.ppy.sh/b/{{score.map_info.beatmap_id}}">{{score.map_info.artist}} - {{score.map_info.title}}</a></div>
-              <div class="score-info">{{score.date}}</div>
+                <div class="song-info"><a href="https://osu.ppy.sh/b/{{score.map_info.beatmap_id}}">{{score.map_info.artist}} - {{score.map_info.title}}</a></div>
+                <div class="score-info">{{score.date|naturaltime}}</div>
             </div>
             <div class="mods">{{score.mods}}</div>
         </div>
-        {% endfor %}
+        <div class="score-detail">
+          AAAAAAAAAAAAAAAAAAAa
+        </div>
+      {% endfor %}
+
     </div>
 </div>
 {% endblock%}
