@@ -2,7 +2,7 @@ import json, datetime, pycountry, time, pytz
 
 from urllib.request import urlopen
 from django.db import models
-from django_cron import CronJobBase, Schedule
+#from django_cron import CronJobBase, Schedule
 from django.core.mail import send_mail
 
 from osugraphs.settings import OSU_API_KEY as _key
