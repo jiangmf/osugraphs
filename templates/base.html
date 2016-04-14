@@ -1,0 +1,31 @@
+{% load static js_tags humanize %}
+
+<html>
+    <head>
+        <title>osu!graphs</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="MobileOptimized" content="width" />
+        <meta name="HandheldFriendly" content="true" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="mobile-web-app-capable" content="yes"/>
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{% static 'css/style.css'%}">
+
+        {% block extra_head %}{% endblock%}
+        
+        
+        
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="logo"><a class="fill" href="/">Home</a></div>
+            {% block app_content %}{% endblock %}
+        </div>
+        <div id="footer">
+            Created and brought to you by <a href="https://osu.ppy.sh/u/1740540">Iceandele</a>
+        </div>
+    </body>
+</html>
