@@ -1,15 +1,26 @@
 {% extends 'base.html' %}
 {% block app_content%}
     <div class="section" id="mod-stats">
+
+    <form id="search" action="" method="post">
+      {% csrf_token %}
+      <input type="text" name="search-query" placeholder="Player name or ID">
+      <input type="submit" value="Search">
+    </form>
+
     <div class="header h2">Early Alpha: Features to Come</div>
       <div class="content">
-         <ul>
-           <li> Sortable Best Scores
-           <li> More Score Info
-           <li> More Map Info
-           <li> Scatter plot of all scores by mod
-         </ul>
+        <ul>
+          <li> Track any user (Currently tracking top 100 due to API limitations)
+          <li> Sortable Best Scores
+          <li> More Score Info
+          <li> More Map Info
+          <li> Scatter plot of all scores by mod
+          <li> User accounts and following players for updates
+          <li> Daily/Weekly/Monthly PP gain leaderboards
+        </ul>
       </div>
+      
     <div class="header h2">Early Alpha: List of Avaliable Users</div>
     <div class="content">
         {% for user in users %}

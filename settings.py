@@ -25,7 +25,7 @@ SECRET_KEY = 'fh*smy!pw!lhq^43eo0l8#xkddf%7lzfj8xo&%vy6(x0kj&9-1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-OSU_API_KEY = 'a34e4ee9c2fa64f220d9474f1530bf391c6f2372'
+OSU_API_KEY = '88a00970766270951c9025f6a69f22133b22164e'
 
 ALLOWED_HOSTS = []
 
@@ -90,18 +90,23 @@ WSGI_APPLICATION = 'osugraphs.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'osugraphs',
+#        'USER': 'postgres',
+#        'PASSWORD': '359527497',
+#        # 'PASSWORD': 'Rh!n0DB',
+#        'HOST': '127.0.0.1',
+#        'PORT': '5432',
+#    },
+#}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'osugraphs',
-        'USER': 'postgres',
-        # 'PASSWORD': '359527497',
-        'PASSWORD': 'Rh!n0DB',
-        'HOST': '127.0.0.1',
-        'PORT': '5433',
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
+    }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

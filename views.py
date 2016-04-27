@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponse
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -10,14 +12,24 @@ def home_view(request, context={}):
     context = {
         'users' : users.order_by('name'),
     }
-
+    if request.method == "POST":
+        print_json(request.POST)
+        try:
+            try:
+                int(request.POST['search-query'])
+                user = User.objects.get(Q(id=request.POST['search-query']) | Q(name__iexact=request.POST['search-query']))
+            except:
+                user = User.objects.get(Q(name__iexact=request.POST['search-query']))
+            return redirect(reverse('profile', args=[user.id]))
+        except:
+            import traceback; traceback.print_exc()
     return render(request, 'index.html', context)
 
 def profile_view(request, context={}, profile_id=None):
     user = User.objects.get(id=profile_id)
     datapoints = user.data_point_set.all()
 
-    score_set = user.score_set.all().order_by('-pp')
+    score_set = user.score_set.all().order_by('-pp').select_related('map_info')
     
     mods = [score.mods for score in score_set.all()]
 

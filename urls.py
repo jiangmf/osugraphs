@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.db.models import get_models, get_app
+from django.apps import apps
 
 from osugraphs import views
 
@@ -25,8 +25,8 @@ class CustomModelAdmin(admin.ModelAdmin):
         super(CustomModelAdmin, self).__init__(model, admin_site)
 
 
-for model in get_models(get_app('osugraphs')):
-    admin.site.register(model, CustomModelAdmin)
+for model in apps.get_app_config('osugraphs').get_models():
+   admin.site.register(model, CustomModelAdmin)
 
 urlpatterns = [
     url(r'^$', views.home_view, name="home"),

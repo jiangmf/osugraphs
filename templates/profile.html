@@ -290,7 +290,13 @@
             <div class="mods">{{score.mods}}</div>
         </div>
         <div class="score-detail">
-          AAAAAAAAAAAAAAAAAAAa
+          {{score.maxcombo}}/{{score.map_info.max_combo}}
+          {{score.accuracy}}
+          <div class="bar-label">STAR</div><div class="bar">{{score.map_info.difficultyrating}}</div>
+          <div class="bar-label">CS:</div><div class="bar">{{score.map_info.diff_size}}</div>
+          <div class="bar-label">OD:</div><div class="bar">{{score.map_info.diff_overall}}</div>
+          <div class="bar-label">AR:</div><div class="bar">{{score.map_info.diff_approach}}</div>
+          <div class="bar-label">HP:</div><div class="bar">{{score.map_info.diff_drain}}</div>
         </div>
       {% endfor %}
 

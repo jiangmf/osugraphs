@@ -175,6 +175,29 @@ div.section {
     background-color: rgba(188,207,2,0.1)
 }
 
+form#search {
+    min-width: 250px;
+    width: 50%;
+    margin: 50px auto;
+    overflow: hidden
+}
+
+form#search > input {
+    width: calc(100% - 85px);
+    float: none;
+    padding: 5px 10px;
+    border: 2px solid #73c5e1;
+}
+
+form#search > input[type="submit"] {
+    width: 75px;
+    padding: 5px 10px;
+    float: right;
+    background-color: #73c5e1;
+    color: white;
+    border: 2px solid #73c5e1;
+}
+
 /* ===== Columns ===== */
 div.half{
     width: 50%;
