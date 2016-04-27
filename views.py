@@ -8,7 +8,7 @@ from osugraphs.models import *
 def home_view(request, context={}):
     users = User.objects.all()
     context = {
-        'users'            : users.order_by('name'),
+        'users' : users.order_by('name'),
     }
 
     return render(request, 'index.html', context)
