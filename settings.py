@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 SHELL_PLUS_PRE_IMPORTS = (
     ('osugraphs.models', '*'),
     ('osugraphs.util', '*'),
+    ('osugraphs.load_data', '*'),
 )
 
 CRONJOBS = [
@@ -50,7 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_extensions',
-    'django_crontab',
+    # 'django_crontab',
     'debug_toolbar',
     'osugraphs',
 )

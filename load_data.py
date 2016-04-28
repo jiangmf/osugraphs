@@ -4,7 +4,15 @@ from osugraphs.osu_api import OsuAPI
 
 osu_api = OsuAPI(OSU_API_KEY)
 
-def get_data(user_id=None):
+def load_players():
+    for page in range(20):
+        osu_api.get_players(page=page)
+
+def load_user_data_points(user_id=None):
+	load_user_info(user_id)
+	load_user_scores(user_id)
+
+def load_user_info(user_id=None):
     query_set = [User.objects.get(id=user_id)] if user_id else User.objects.all()
 
     for user in query_set:
@@ -17,8 +25,9 @@ def get_data(user_id=None):
         data['user'] = user
 
         DataPoint.objects.create(**data)
+        print("Created DataPoint for {}".format(user))
 
-def get_scores(user_id=None):
+def load_user_scores(user_id=None):
     query_set = [User.objects.get(id=user_id)] if user_id else User.objects.all()
 
     for user in query_set:
@@ -26,33 +35,20 @@ def get_scores(user_id=None):
 
         for score in data:
             score.pop("user_id")
+
             beatmap_id = int(score.pop('beatmap_id'))
+
             score['user'] = user
             score['date'] = datetime.datetime.strptime(score['date'], '%Y-%m-%d %H:%M:%S')
             
             try:
-                map_info = MapInfo.objects.get(beatmap_id = beatmap_id)
+                map_info = MapInfo.objects.get(beatmap_id=beatmap_id)
                 print("SKIPPED MAPINFO REQUEST")
             except MapInfo.DoesNotExist:
-                response = urlopen(
-                    'https://osu.ppy.sh/api/get_beatmaps?k={0}&b={1}&m=0'.format(_key, beatmap_id)
-                    )
-                data = json.loads(response.readall().decode('utf-8'))[0]
-                map_info = MapInfo.objects.create(
-                    beatmap_id=beatmap_id, 
-                    artist = data['artist'],
-                    title  = data['title'],
-                    bpm = data['bpm'],
-                    difficultyrating = data['difficultyrating'],
-                    diff_size = data['diff_size'],
-                    diff_overall =data['diff_overall'],
-                    diff_approach = data['diff_approach'],
-                    diff_drain = data['diff_drain'],
-                    hit_length = data['hit_length'],
-                    version = data['title'],
-                )
+                map_info = load_beatmap_data(beatmap_id=beatmap_id)
 
             score['map_info'] = map_info
+
             try:
                 score_obj = Score.objects.get(user=user, map_info=map_info)
                 print(score_obj.date)
@@ -63,14 +59,50 @@ def get_scores(user_id=None):
                     score_obj.date.hour   == score['date'].hour   and
                     score_obj.date.minute == score['date'].minute and
                     score_obj.date.second == score['date'].second) :
-                    continue
                     print("SKIPPED CREATING SCORE")
+                    continue
                 else:
                     score_obj.update(**score)
                     score_obj.save()
                     print("UPDATED SCORE")
             except Score.DoesNotExist:
                 Score.objects.create(**score)
+
+def load_beatmap_data(since=None, beatmap_id=None):
+    if since:
+        data = osu_api.get_beatmaps(since=since)
+    if beatmap_id:
+        data = osu_api.get_beatmaps(b=beatmap_id)
+
+    last_bmap_date = datetime.date(1900,1,1)
+
+    for bmap in data:
+        bmap['approved_date'] = datetime.datetime.strptime(bmap['approved_date'], '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
+        bmap['last_update'] = datetime.datetime.strptime(bmap['last_update'], '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.utc)
+
+        if bmap['approved_date'].date() > last_bmap_date:
+            last_bmap_date = bmap['approved_date'].date()
+
+        beatmap_id = bmap.pop('beatmap_id')
+
+        map_info, created = MapInfo.objects.update_or_create(beatmap_id=beatmap_id, defaults=bmap)
+        if created: 
+            print("Created Map ID {0}".format(map_info.beatmap_id))
+
+    if since:
+        return last_bmap_date
+    if beatmap_id:
+        return map_info
+
+def get_all_beatmap_datas():
+    day = datetime.date(2007,10,7)
+    while day < datetime.datetime.today().date():
+        print("===========================================================")
+        print(day.strftime("%Y-%m-%d"))
+        print("===========================================================")
+        last_bmap_date = load_beatmap_data(since=day.strftime("%Y-%m-%d"))
+        day = last_bmap_date - datetime.timedelta(days=1)
+        time.sleep(0.5)
 
 def get_user(user_id):
     get_data(user_id)
