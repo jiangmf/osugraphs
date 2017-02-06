@@ -4,8 +4,8 @@ from osugraphs.osu_api import OsuAPI
 
 osu_api = OsuAPI(OSU_API_KEY)
 
-def load_players():
-    for page in range(20):
+def load_users_from_leaderboards():
+    for page in range(5):
         osu_api.get_players(page=page)
 
 def load_user_data_points(user_id=None):
@@ -15,7 +15,9 @@ def load_user_data_points(user_id=None):
 def load_user_info(user_id=None):
     query_set = [User.objects.get(id=user_id)] if user_id else User.objects.all()
 
-    for user in query_set:
+    for i, user in enumerate(query_set):
+        if i % 100 == 0:
+            time.sleep(0.5)
         data = osu_api.get_user(u=user.id)[0]
         
         data.pop("user_id")
@@ -30,7 +32,9 @@ def load_user_info(user_id=None):
 def load_user_scores(user_id=None):
     query_set = [User.objects.get(id=user_id)] if user_id else User.objects.all()
 
-    for user in query_set:
+    for i, user in enumerate(query_set):
+        if i % 100 == 0:
+            time.sleep(0.5)
         data = osu_api.get_user_best(u=user.id, limit=100)
 
         for score in data:
@@ -43,7 +47,7 @@ def load_user_scores(user_id=None):
             
             try:
                 map_info = MapInfo.objects.get(beatmap_id=beatmap_id)
-                print("SKIPPED MAPINFO REQUEST")
+                # print("SKIPPED MAPINFO REQUEST")
             except MapInfo.DoesNotExist:
                 map_info = load_beatmap_data(beatmap_id=beatmap_id)
 
@@ -51,20 +55,18 @@ def load_user_scores(user_id=None):
 
             try:
                 score_obj = Score.objects.get(user=user, map_info=map_info)
-                print(score_obj.date)
-                print(score['date']) 
                 if (score_obj.date.year   == score['date'].year   and
                     score_obj.date.month  == score['date'].month  and
                     score_obj.date.day    == score['date'].day    and
                     score_obj.date.hour   == score['date'].hour   and
                     score_obj.date.minute == score['date'].minute and
                     score_obj.date.second == score['date'].second) :
-                    print("SKIPPED CREATING SCORE")
+                    # print("SKIPPED CREATING SCORE")
                     continue
                 else:
-                    score_obj.update(**score)
+                    Score.objects.filter(pk=score_obj.pk).update(**score)
                     score_obj.save()
-                    print("UPDATED SCORE")
+                    # print("UPDATED SCORE")
             except Score.DoesNotExist:
                 Score.objects.create(**score)
 
@@ -94,7 +96,7 @@ def load_beatmap_data(since=None, beatmap_id=None):
     if beatmap_id:
         return map_info
 
-def get_all_beatmap_datas():
+def load_all_beatmaps():
     day = datetime.date(2007,10,7)
     while day < datetime.datetime.today().date():
         print("===========================================================")
@@ -103,7 +105,3 @@ def get_all_beatmap_datas():
         last_bmap_date = load_beatmap_data(since=day.strftime("%Y-%m-%d"))
         day = last_bmap_date - datetime.timedelta(days=1)
         time.sleep(0.5)
-
-def get_user(user_id):
-    get_data(user_id)
-    get_scores(user_id)

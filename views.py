@@ -40,7 +40,6 @@ def profile_view(request, context={}, profile_id=None):
     soup = BeautifulSoup(html, 'html.parser')
 
     profile_picture = "https:" + soup.find_all(class_="avatar-holder")[0].find_all('img')[0].get('src')
-    print(profile_picture)
 
     for mod in mods:
         if "HD" in str(mod):
@@ -62,19 +61,19 @@ def profile_view(request, context={}, profile_id=None):
         if "HD" in str(score.mods) and count_hd < 10:
             performance_hd = performance_hd + score.pp * pow(0.95, count_hd)
             count_hd += 1
-            print("HD", performance_hd)
+            # print("HD", performance_hd)
         if "HR" in str(score.mods) and count_hr < 10:
             performance_hr = performance_hr + score.pp * pow(0.95, count_hr)
             count_hr += 1
-            print("HR", performance_hr)
+            # print("HR", performance_hr)
         if ("DT" in str(score.mods) or "NC" in str(score.mods)) and count_dt < 10:
             performance_dt = performance_dt + score.pp * pow(0.95, count_dt)
             count_dt += 1
-            print("DT", performance_dt)
+            # print("DT", performance_dt)
         if "None" in str(score.mods) and count_nomod < 10:
             performance_nomod = performance_nomod + score.pp * pow(0.95, count_nomod)
             count_nomod += 1
-            print("NOMOD", performance_nomod)
+            # print("NOMOD", performance_nomod)
 
 
     context = {
@@ -91,10 +90,10 @@ def profile_view(request, context={}, profile_id=None):
         'num_dt'           : num_dt,
         'num_nomod'        : num_nomod,
         'profile_picture'  : profile_picture,
-        'performance_nomod': performance_nomod,
-        'performance_hd'   : performance_hd,
-        'performance_hr'   : performance_hr,
-        'performance_dt'   : performance_dt,
+        'performance_nomod': round(performance_nomod,2),
+        'performance_hd'   : round(performance_hd,2),
+        'performance_hr'   : round(performance_hr,2),
+        'performance_dt'   : round(performance_dt,2),
 
     }
     return render(request, 'profile.html', context)

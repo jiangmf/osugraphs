@@ -1,5 +1,4 @@
 import requests, json
-from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from collections import OrderedDict
 from osugraphs.models import *
@@ -74,15 +73,15 @@ class OsuAPI(object):
         return "http://bloodcat.com/osu/s/{}".format(map_set_id)
 
     def get_user_profile_image(self, user_id):
-        response = urlopen('https://osu.ppy.sh/u/{}'.format(user_id))
-        html = response.read()
-        soup = BeautifulSoup(html, 'html.parser')
+        response = requests.get('https://osu.ppy.sh/u/{}'.format(user_id)).text
+        # html = response.read()
+        soup = BeautifulSoup(response, 'html.parser')
         return "https:" + soup.find_all(class_="avatar-holder")[0].find_all('img')[0].get('src')
 
     def get_players(self, page=None):
-        response = urlopen('https://osu.ppy.sh/p/pp/?m=0&s=3&o=1&f=0&page={}'.format(page))
-        html = response.read()
-        soup = BeautifulSoup(html, 'html.parser')
+        response = requests.get('https://osu.ppy.sh/p/pp/?m=0&s=3&o=1&f=0&page={}'.format(page)).text
+        # html = response.read()
+        soup = BeautifulSoup(response, 'html.parser')
 
         for tr in soup.find_all(class_="beatmapListing")[0].find_all('tr'):
             try:

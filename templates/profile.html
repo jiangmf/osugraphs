@@ -2,9 +2,10 @@
 {% load static js_tags humanize %}
 {% block extra_head %}
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-<script type="text/javascript" src="{% static 'js/canvasjs.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
 <script type="text/javascript">
     function intToString(value) {
+      console.log("in int To String" + value)
         var newValue = value;
         if (value >= 1000) {
             var suffixes = ["", "k", "m", "b","t"];
@@ -20,172 +21,294 @@
         }
         return newValue;
     }
-    window.onload = function() {
-        var modDistribution = new CanvasJS.Chart("modDistribution", {
-          title: {
-              text: "Mod Distrubution ",
-              fontFamily: "Open Sans",
-          },
-          data: [{
-              type: "doughnut",
-              indexLabelPlacement: "outside",
-              startAngle: 90, //vary the angle here.
-              dataPoints: [{
-                  x: 10,
-                  y: {{num_nomod}},
-                  label: "No Mod",
-                  color: "#BCCF02"
-              }, {
-                  x: 20,
-                  y: {{num_dt}},
-                  label: "DT",
-                  color: "#73c5e1"
-              }, {
-                  x: 30,
-                  y: {{num_hd}},
-                  label: "HD",
-                  color: "#F6E97F"
-              }, {
-                  x: 40,
-                  y: {{num_hr}},
-                  label: "HR",
-                  color: "#eb65a0"
-              }, ]
-          }]
-        }); 
-        modDistribution.render();   
-        var modPerformance = new CanvasJS.Chart("modPerformance", {
-          title: {
-              text: "Mod Performance",
-              fontFamily: "Open Sans",
-          },
-          axisY: {
-              gridThickness: 0,
-              includeZero: false,
-          },
-          data: [
-              {
-                  dataPoints: [{
-                      x: 10,
-                      y: {{performance_nomod}},
-                      label: "No Mod",
-                      color: "#BCCF02"
-                  }, {
-                      x: 20,
-                      y: {{performance_dt}},
-                      label: "DT",
-                      color: "#73c5e1"
-                  }, {
-                      x: 30,
-                      y: {{performance_hd}},
-                      label: "HD",
-                      color: "#F6E97F"
-                  }, {
-                      x: 40,
-                      y: {{performance_hr}},
-                      label: "HR",
-                      color: "#eb65a0"
-                  }, ]
-              }
-          ]
-        }); 
-        modPerformance.render();    
-        var ppTimeSeries = new CanvasJS.Chart("ppTimeSeries", {
-            zoomEnabled: true,
-            panEnabled: true, 
-            title: {
-                fontFamily: "Open Sans",
-                text: "PP vs Rank",
-            },
-            axisX: {
-                gridThickness: 0,
-                valueFormatString: "MMM D H:mm",
-                zoomable: true,
-            },
-            axisY: {
-                includeZero: false,
-                gridThickness: 1,
-                gridColor: "#DDDDDD"
-            },
-            axisY2: {
-                includeZero: false,
-                gridThickness: 1,
-                gridColor: "#DDDDDD",
-                 labelFormatter: function ( e ) {
-                       return e.value.toString().substring(1);  
-                }
-            },
-            data: [{
-                type: "line",
-                color: "#73c5e1",
-                dataPoints: [ //array
-                    {% for datapoint in datapoints %}
-                        {x: {{datapoint.time|chart_date}},y: {{datapoint.pp_raw}} },
-                    {% endfor%}
-                ]
-            },
-            {
-                type: "line",
-                axisYType: "secondary",
-                color: "#eb65a0",
-                // toolTipContent: function (e) {
-                //     alert(e)
-                // },
-                dataPoints: [ //array
-                    {% for datapoint in datapoints %}
-                        {x: {{datapoint.time|chart_date}},y: -{{datapoint.pp_rank}} },
-                    {% endfor%}
-                ]
-            }]
-        }); 
-        ppTimeSeries.render();
-        var hitCountTimeSeries = new CanvasJS.Chart("hitCountTimeSeries", {
-            title: {
-                fontFamily: "Open Sans",
-                text: "Score vs Level",
-            },
-            axisX: {
-                gridThickness: 0,
-                valueFormatString: "MMM D H:mm",
-            },
-            axisY: {
-                includeZero: false,
-                gridThickness: 1,
-                gridColor: "#DDDDDD",
-                labelFormatter: function ( e ) {
-                       return intToString(e.value);  
-                }  
-            },
-            axisY2: {
-                includeZero: false,
-                gridThickness: 1,
-                gridColor: "#DDDDDD"
-            },
-            data: [{
-                type: "line",
-                color: "#73c5e1",
-                dataPoints: [ //array
-                    {% for datapoint in datapoints %}
-                        {x: {{datapoint.time|chart_date}},y: {{datapoint.total_score}} },
-                    {% endfor%}
-                ]
-            },
-            {
-                type: "line",
-                axisYType: "secondary",
-                color: "#eb65a0",
-                dataPoints: [ //array
-                    {% for datapoint in datapoints %}
-                        {x: {{datapoint.time|chart_date}},y: {{datapoint.level}} },
-                    {% endfor%}
-                ]
-            },]
-        }); 
-        hitCountTimeSeries.render();
+
+    function round(n, precision) {
+      var prec = Math.pow(10, precision);
+      return Math.round(n*prec)/prec;
+    }
+
+    function format(n) {
+      var base = Math.floor(Math.log(Math.abs(n))/Math.log(1000));
+      var suffix = 'kmbtqQ'[base-1];
+      console.log(n + "   " + suffix ? round(n/Math.pow(1000,base),2)+suffix : ''+n);
+      return suffix ? round(n/Math.pow(1000,base),2)+suffix : ''+round(n,2);
     }
 
     $(document).ready(function(){
-       $(".score").click(function() {
+
+      var ctx = $("#modDistribution");
+      var modDistribution = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ["No Mod", "DT", "HD", "HR"],
+          datasets:[{
+            data: [{{num_nomod}},{{num_dt}},{{num_hd}},{{num_hr}}],
+            backgroundColor: [
+              "#BCCF02", "#73c5e1", "#F6E97F", "#eb65a0"
+            ]
+          }]
+        },
+        options: {
+          title: {
+            display: true,
+            text: 'Mod Distribution',
+            fontFamily: "Open Sans",
+          },
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom',
+          }
+        },
+      });
+
+      var ctx = $("#modPerformance");
+      var modPerformance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ["No Mod", "DT", "HD", "HR"],
+            datasets:[{
+              data: [{{performance_nomod}},{{performance_dt}},{{performance_hd}},{{performance_hr}}],
+              backgroundColor: [
+                "#BCCF02", "#73c5e1", "#F6E97F", "#eb65a0"
+              ]
+            }]
+          },
+          options: {
+            title: {
+              display: true,
+              text: 'Mod Distribution',
+              fontFamily: "Open Sans",
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false,
+            },
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero:true
+                }
+              }]
+            }
+          },
+      });
+
+      var ctx = $("#ppTimeSeries");
+      var ppTimeSeries = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets:[
+            {
+              label: "PP",
+              data: [
+                {% for datapoint in datapoints %}
+                {
+                  x: {{datapoint.time|chart_date}},
+                  y: {{datapoint.pp_raw}},
+                },
+                {% endfor%}
+              ],
+              borderColor: "#73c5e1",
+              backgroundColor: "#73c5e1",
+              fill: false,
+              yAxisID: 1,
+            },
+            {
+              label: "Rank",
+              data: [
+                {% for datapoint in datapoints %}
+                {
+                  x: {{datapoint.time|chart_date}},
+                  y: {{datapoint.pp_rank}},
+                },
+                {% endfor%}
+              ],
+              borderColor: "#eb65a0",
+              backgroundColor: "#eb65a0",
+              fill: false,
+              yAxisID: 2,
+            }
+          ],
+        },
+        options: {
+          title: {
+            display: true,
+            text: 'PP vs Rank',
+            fontFamily: "Open Sans",
+          },
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom',
+          },
+          tooltips: {
+            mode: 'x',
+          },
+          scales: {
+            xAxes: [{
+              type: 'time',
+              time: {
+                displayFormats: {
+                  quarter: 'MMM YYYY'
+                },
+                tooltipFormat: 'MMM DD, YYYY, HH:mm'
+              }
+            }],
+            yAxes: [
+              {
+                scaleLabel: {
+                  labelString: "PP",
+                  display: true,
+                },
+                scaleType: "linear",
+                id: 1,
+                gridLines: {
+                  display: false,
+                },
+                ticks: {
+                  callback: function(value, index, values) {
+                    return format(value);
+                  },
+                  suggestedMin: 0,
+                }
+              },
+              {
+                scaleLabel: {
+                  labelString: "Rank",
+                  display: true,
+                },
+                scaleType: "linear",
+                id: 2,
+                gridLines: {
+                  display: false,
+                },
+                ticks: {
+                  reverse: true,
+                  callback: function(value, index, values) {
+                    return format(value);
+                  },
+                  suggestedMin: 1,
+                },
+              },
+            ]
+          }
+        },
+      });
+
+      var ctx = $("#hitCountTimeSeries");
+      var hitCountTimeSeries = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets:[
+            {
+              label: "%300",
+              data: [
+                {% for datapoint in datapoints %}
+                {
+                  x: {{datapoint.time|chart_date}},
+                  y: {{datapoint.percent300}},
+                },
+                {% endfor%}
+              ],
+              borderColor: "#73c5e1",
+              backgroundColor: "#73c5e1",
+              fill: false,
+              yAxisID: 1,
+            },
+            {
+              label: "%100",
+              data: [
+                {% for datapoint in datapoints %}
+                {
+                  x: {{datapoint.time|chart_date}},
+                  y: {{datapoint.percent100}},
+                },
+                {% endfor%}
+              ],
+              borderColor: "#BCCF02",
+              backgroundColor: "#BCCF02",
+              fill: false,
+              yAxisID: 2,
+            },
+            {
+              label: "%50",
+              data: [
+                {% for datapoint in datapoints %}
+                {
+                  x: {{datapoint.time|chart_date}},
+                  y: {{datapoint.percent50}},
+                },
+                {% endfor%}
+              ],
+              borderColor: "#F6E97F",
+              backgroundColor: "#F6E97F",
+              fill: false,
+              yAxisID: 3,
+            }
+          ],
+        },
+        options: {
+          title: {
+            display: true,
+            text: 'PP vs Rank',
+            fontFamily: "Open Sans",
+          },
+          maintainAspectRatio: false,
+          legend: {
+            position: 'bottom',
+          },
+          tooltips: {
+            mode: 'x',
+          },
+          scales: {
+            xAxes: [{
+              type: 'time',
+              time: {
+                displayFormats: {
+                  quarter: 'MMM YYYY'
+                },
+                tooltipFormat: 'MMM DD, YYYY, HH:mm'
+              }
+            }],
+            yAxes: [
+              {
+                scaleLabel: {
+                  labelString: "%300",
+                  display: true,
+                },
+                scaleType: "linear",
+                id: 1,
+                ticks: {
+                  suggestedMin: 0,
+                },
+              },
+              {
+                scaleLabel: {
+                  labelString: "%100",
+                  display: true,
+                },
+                scaleType: "linear",
+                id: 2,
+                ticks: {
+                  suggestedMin: 0,
+                },
+              },
+              {
+                scaleLabel: {
+                  labelString: "%50",
+                  display: true,
+                },
+                scaleType: "linear",
+                id: 3,
+                ticks: {
+                  suggestedMin: 0,
+                },
+              },
+            ]
+          }
+        },
+      });
+
+      $(".score").click(function() {
         if($(this).next(".score-detail").is(":visible")){
           $(this).removeClass("selected")
           $(this).next("div").slideUp("fast");
@@ -253,10 +376,10 @@
     <div class="header h2">Mods</div>
     <div class="content">
         <div class="small-graph-container">
-            <div id="modDistribution" style="height: 250px; width: 100%;"></div>
+            <canvas id="modDistribution" height="250px" width="100%"></canvas>
         </div>
         <div class="small-graph-container">
-            <div id="modPerformance" style="height: 250px; width: 100%;"></div>
+            <canvas id="modPerformance" height="250px" width="100%"></canvas>
         </div>
     </div>
 </div>
@@ -265,10 +388,10 @@
     <div class="header h2">Charts</div>
     <div class="content">
         <div class="large-graph-container">
-            <div id="ppTimeSeries" style="height: 300px; width: 100%;"></div>
+            <canvas id="ppTimeSeries" height="300px" width="100%"></canvas>
         </div>
         <div class="large-graph-container">
-            <div id="hitCountTimeSeries" style="height: 300px; width: 100%;"></div>
+            <canvas id="hitCountTimeSeries" height="300px" width="100%"></canvas>
         </div>
     </div>
 </div>

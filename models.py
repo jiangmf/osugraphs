@@ -41,6 +41,19 @@ class DataPoint(models.Model):
     count_rank_a = models.IntegerField()
     pp_country_rank = models.IntegerField()
 
+    @property
+    def percent300(self):
+        return round(self.count300/(self.count300+self.count100+self.count50)*100,2)
+
+    @property
+    def percent100(self):
+        return round(self.count100/(self.count300+self.count100+self.count50)*100,2)
+
+    @property
+    def percent50(self):
+        return round(self.count50/(self.count300+self.count100+self.count50)*100,2)
+    
+
 class Score(models.Model):
     user = models.ForeignKey(User, related_name='score_set')
     

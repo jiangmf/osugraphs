@@ -91,23 +91,28 @@ WSGI_APPLICATION = 'osugraphs.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'nisja123_osugraphs',
+#         'USER': 'nisja123_osu',
+#         #'PASSWORD': '359527497',
+#         'PASSWORD': 'Rh!n0DB',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3306',
+#     },
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'nisja123_osugraphs',
-        'USER': 'nisja123_osu',
-        #'PASSWORD': '359527497',
-        'PASSWORD': 'Rh!n0DB',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-    },
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'osugraphs',
+        'USER': 'postgres',
+        'PASSWORD': 'a',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
 }
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': 'mydatabase',
-#    }
-#}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
