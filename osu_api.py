@@ -1,7 +1,8 @@
 import requests, json
 from bs4 import BeautifulSoup
 from collections import OrderedDict
-from osugraphs.models import *
+from osugraphs.models import User, DataPoint, Score, MapInfo
+import random
 
 MODS = OrderedDict([
         ("NF"       , 0b00000000000000000000000000001),
@@ -50,6 +51,9 @@ class OsuAPI(object):
         return {k: v for k, v in params.items() if v is not None}
 
     def request(self, method, **kwargs):
+        i = random.randint(0,100)
+        if i == 0:
+            time.sleep(0.5)
         if 'params' in kwargs:
             kwargs['params'].update({"k": self.api_key})
         r = requests.get(self.ROOT_URL + method, **kwargs)

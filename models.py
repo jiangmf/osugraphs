@@ -7,11 +7,21 @@ from django.core.mail import send_mail
 
 from osugraphs.settings import OSU_API_KEY
 from osugraphs.util import print_json, pprint
-from osugraphs.osu_api import OsuAPI
 
 from bs4 import BeautifulSoup
 
-osu_api = OsuAPI(OSU_API_KEY)
+def get_mod_combination(self, mod):
+        if mod == 0:
+            return ["None"]
+        elif mod == 576:
+            return ["NC"]
+
+        ret = []
+        for k, v in MODS.items():
+            if mod & v:
+                ret.append(k)
+
+        return ret
 
 class User(models.Model):
     name = models.CharField(max_length=50)
@@ -102,7 +112,7 @@ class Score(models.Model):
 
         # binary = [int(x) for x in bin(self.enabled_mods)[2:]]
 
-        return "".join(osu_api.get_mod_combination(self.enabled_mods))
+        return "".join(get_mod_combination(self.enabled_mods))
 
 
     @property
