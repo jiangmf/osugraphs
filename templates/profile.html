@@ -281,6 +281,9 @@
                 ticks: {
                   // suggestedMin: 0,
                 },
+                gridLines: {
+                  display: false,
+                },
               },
               {
                 scaleLabel: {
@@ -292,6 +295,9 @@
                 ticks: {
                   // suggestedMin: 0,
                 },
+                gridLines: {
+                  display: false,
+                },
               },
               {
                 scaleLabel: {
@@ -302,6 +308,9 @@
                 id: 3,
                 ticks: {
                   // suggestedMin: 0,
+                },
+                gridLines: {
+                  display: false,
                 },
               },
             ]
@@ -321,14 +330,29 @@
         }
       });
 
-      $(".score-detail").each(function(){
-        imageUrl = $(this).find('img').attr("src");
-        $(this).find(".beatmap-image").hide()
-        $(this).css('background-image', 'url(' + imageUrl + ')');
-      })
+      function adjustBeatmapImg(){
+        if (window.innerWidth <= 720) {
+          $(".score-detail").each(function(){
+            imageUrl = $(this).find('img').attr("src");
+            $(this).find(".beatmap-image").hide()
+            $(this).css('background-image', 'url(' + imageUrl + ')');
+          })
+        } else {
+          $(".score-detail").each(function(){
+            $(this).find(".beatmap-image").show()
+            $(this).css('background-image', 'none');
+          })
+        }
+      };
+
+      $(window).resize(function(){
+        adjustBeatmapImg();
+      });
+
+      adjustBeatmapImg();
 
       $(".bar").each(function(){
-        $(this).css('width', Math.min(parseFloat($(this).html()),10)*22);
+        $(this).css('width', Math.min(parseFloat($(this).html()),10)*16);
       })
     })
 </script>
