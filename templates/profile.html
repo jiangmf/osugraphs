@@ -5,7 +5,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
 <script type="text/javascript">
     function intToString(value) {
-      console.log("in int To String" + value)
         var newValue = value;
         if (value >= 1000) {
             var suffixes = ["", "k", "m", "b","t"];
@@ -30,7 +29,6 @@
     function format(n) {
       var base = Math.floor(Math.log(Math.abs(n))/Math.log(1000));
       var suffix = 'kmbtqQ'[base-1];
-      console.log(n + "   " + suffix ? round(n/Math.pow(1000,base),2)+suffix : ''+n);
       return suffix ? round(n/Math.pow(1000,base),2)+suffix : ''+round(n,2);
     }
 
@@ -76,7 +74,7 @@
           options: {
             title: {
               display: true,
-              text: 'Mod Distribution',
+              text: 'Mod Performance',
               fontFamily: "Open Sans",
             },
             maintainAspectRatio: false,
@@ -86,7 +84,10 @@
             scales: {
               yAxes: [{
                 ticks: {
-                  beginAtZero:true
+                  beginAtZero:true,
+                  callback: function(value, index, values) {
+                    return format(value);
+                  },
                 }
               }]
             }
@@ -168,7 +169,7 @@
                   callback: function(value, index, values) {
                     return format(value);
                   },
-                  suggestedMin: 0,
+                  // suggestedMin: 0,
                 }
               },
               {
@@ -186,7 +187,7 @@
                   callback: function(value, index, values) {
                     return format(value);
                   },
-                  suggestedMin: 1,
+                  // suggestedMin: 1,
                 },
               },
             ]
@@ -278,7 +279,7 @@
                 scaleType: "linear",
                 id: 1,
                 ticks: {
-                  suggestedMin: 0,
+                  // suggestedMin: 0,
                 },
               },
               {
@@ -289,7 +290,7 @@
                 scaleType: "linear",
                 id: 2,
                 ticks: {
-                  suggestedMin: 0,
+                  // suggestedMin: 0,
                 },
               },
               {
@@ -300,7 +301,7 @@
                 scaleType: "linear",
                 id: 3,
                 ticks: {
-                  suggestedMin: 0,
+                  // suggestedMin: 0,
                 },
               },
             ]
@@ -319,6 +320,16 @@
           $(this).next(".score-detail").slideToggle("fast");
         }
       });
+
+      $(".score-detail").each(function(){
+        imageUrl = $(this).find('img').attr("src");
+        $(this).find(".beatmap-image").hide()
+        $(this).css('background-image', 'url(' + imageUrl + ')');
+      })
+
+      $(".bar").each(function(){
+        $(this).css('width', Math.min(parseFloat($(this).html()),10)*22);
+      })
     })
 </script>
 {% endblock %}
@@ -413,13 +424,23 @@
             <div class="mods">{{score.mods}}</div>
         </div>
         <div class="score-detail">
-          {{score.maxcombo}}/{{score.map_info.max_combo}}
-          {{score.accuracy}}
-          <div class="bar-label">STAR</div><div class="bar">{{score.map_info.difficultyrating}}</div>
-          <div class="bar-label">CS:</div><div class="bar">{{score.map_info.diff_size}}</div>
-          <div class="bar-label">OD:</div><div class="bar">{{score.map_info.diff_overall}}</div>
-          <div class="bar-label">AR:</div><div class="bar">{{score.map_info.diff_approach}}</div>
-          <div class="bar-label">HP:</div><div class="bar">{{score.map_info.diff_drain}}</div>
+          <div class="layer"></div>
+          <div class="beatmap-image"><img src="https://b.ppy.sh/thumb/{{score.map_info.beatmapset_id}}l.jpg"></div>
+          <div class="score-stats">
+            <div><div class="bar-label">Combo:</div>{{score.maxcombo}}/{{score.map_info.max_combo}}x</div>
+            <div><div class="bar-label">Accuracy:</div>{{score.accuracy}}%</div>
+            <div><div class="bar-label">STAR:</div><div class="bar-out"><div class="bar">{{score.map_info.difficultyrating|floatformat}}</div></div></div>
+            <div><div class="bar-label">CS:</div><div class="bar-out"><div class="bar">{{score.map_info.diff_size}}</div></div></div>
+            <div><div class="bar-label">OD:</div><div class="bar-out"><div class="bar">{{score.map_info.diff_overall}}</div></div></div>
+            <div><div class="bar-label">AR:</div><div class="bar-out"><div class="bar">{{score.map_info.diff_approach}}</div></div></div>
+            <div><div class="bar-label">HP:</div><div class="bar-out"><div class="bar">{{score.map_info.diff_drain}}</div></div></div>
+          </div>
+          <div class="beatmap-links">
+            <a class="beatmap-link osu-direct" href="osu://dl/{{score.map_info.beatmap_id}}">osu! Direct</a>
+            <a class="beatmap-link bloodcat" href="http://bloodcat.com/osu/s/{{score.map_info.beatmapset_id}}" download>Bloodcat</a>
+            <a class="beatmap-link osuppysh" href="https://osu.ppy.sh/d/{{score.map_info.beatmapset_id}}" download>Download</a>
+
+          </div>
         </div>
       {% endfor %}
 

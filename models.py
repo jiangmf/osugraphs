@@ -5,10 +5,13 @@ from django.db import models
 #from django_cron import CronJobBase, Schedule
 from django.core.mail import send_mail
 
-from osugraphs.settings import OSU_API_KEY as _key
+from osugraphs.settings import OSU_API_KEY
 from osugraphs.util import print_json, pprint
+from osugraphs.osu_api import OsuAPI
 
 from bs4 import BeautifulSoup
+
+osu_api = OsuAPI(OSU_API_KEY)
 
 class User(models.Model):
     name = models.CharField(max_length=50)
@@ -79,23 +82,35 @@ class Score(models.Model):
         return "img/rank/{0}.png".format(self.rank)
     @property
     def mods(self):
-        # TODO: REWORK THIS
-        if self.enabled_mods == 0:
-            return "None"
-        elif self.enabled_mods == 8:
-            return "HD"
-        elif self.enabled_mods == 16:
-            return "HR"
-        elif self.enabled_mods == 24:
-            return "HDHR"
-        elif self.enabled_mods == 64:
-            return "DT"
-        elif self.enabled_mods == 72:
-            return "HDDT"
-        elif self.enabled_mods == 576:
-            return "NC"
-        elif self.enabled_mods == 584:
-            return "HDNC"
+        # # TODO: REWORK THIS
+        # if self.enabled_mods == 0:
+        #     return "None"
+        # elif self.enabled_mods == 8:
+        #     return "HD"
+        # elif self.enabled_mods == 16:
+        #     return "HR"
+        # elif self.enabled_mods == 24:
+        #     return "HDHR"
+        # elif self.enabled_mods == 64:
+        #     return "DT"
+        # elif self.enabled_mods == 72:
+        #     return "HDDT"
+        # elif self.enabled_mods == 576:
+        #     return "NC"
+        # elif self.enabled_mods == 584:
+        #     return "HDNC"
+
+        # binary = [int(x) for x in bin(self.enabled_mods)[2:]]
+
+        return "".join(osu_api.get_mod_combination(self.enabled_mods))
+
+
+    @property
+    def accuracy(self):
+        return round(
+            (self.count300*6 + self.count100*2 + self.count50*1)/
+            (self.count300*6 + self.count100*6 + self.count50*6 + self.countmiss*6)*100,2)
+    
 
 class MapInfo(models.Model):
     approved = models.IntegerField()

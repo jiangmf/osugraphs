@@ -141,6 +141,7 @@ div.section {
     width: 50px;
     text-align: right;
     font-weight: bold;
+    direction:rtl;
 }
 
 .score > .score-data > .song-info {
@@ -167,12 +168,83 @@ div.section {
 .score-detail { 
     display: none;
     width: 100%;
-    height: 150px;
+    /*height: 130px;*/
     border: 1px dashed #bccf02;
     border-radius: 10px;
     margin-top: 10px;
     padding: 5px 10px;
-    background-color: rgba(188,207,2,0.1)
+    /*background-color: rgba(255,255,255,0.8);*/
+    background-size: cover;
+    background-position: center;
+    position:relative;
+    box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.6);
+}
+
+.score-detail > .beatmap-image {
+    height: 120px;
+    display: inline-block;
+}
+
+.score-detail > .beatmap-image > img{
+    border-radius: 10px;
+}
+
+.score-stats {
+    width: 300px;
+    display:inline-block;
+}
+
+.bar-label {
+    font-weight: bold;
+    width: 80px;
+    display: inline-block;
+}
+
+.bar-out{
+    display: inline-block;
+    width: 220px;
+    background-color: #f5f5f5;
+    height:16px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3)
+}
+
+.bar {
+    padding: 0 5px;
+    display: inline-block;
+    width: 220px;
+    background-color: #73c5e1;
+    color: white;
+    height:16px;
+    line-height: 16px;
+}
+
+.beatmap-links {
+    display: inline-block;
+    float: right;
+    width: 154px;
+    height: 66px;
+    transform-origin: 51% 119%;
+    -webkit-transform: rotate(90deg);
+}
+
+.beatmap-link{
+    display: inline-block;
+    background-color: #73c5e1;
+    color:white;
+    width: 100%;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid #f5f5f5;
+    margin-bottom: 2px;
+}
+
+.beatmap-link.bloodcat{
+    background-color: #FF1953;
+}
+
+.beatmap-link.osuppysh{
+    background-color: #eb65a0;
 }
 
 form#search {
@@ -203,7 +275,6 @@ div.half{
     width: 50%;
     display: inline-block;
 }
-
 
 
 /* ===== Font ===== */

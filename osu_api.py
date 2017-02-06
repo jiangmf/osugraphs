@@ -65,6 +65,8 @@ class OsuAPI(object):
         for k, v in MODS.items():
             if mod & v:
                 ret.append(k)
+
+        return ret
     
     def get_osu_direct_link(self, map_set_id):
         return "osu://dl/{}",format(map_set_id)
