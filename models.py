@@ -10,7 +10,7 @@ from osugraphs.util import print_json, pprint
 
 from bs4 import BeautifulSoup
 
-def get_mod_combination(self, mod):
+def get_mod_combination(mod):
         if mod == 0:
             return ["None"]
         elif mod == 576:
