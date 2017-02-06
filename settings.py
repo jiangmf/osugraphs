@@ -36,7 +36,7 @@ SHELL_PLUS_PRE_IMPORTS = (
 )
 
 CRONJOBS = [
-    ('0 * * * *', 'osugraphs.load_data.load_user_datapoints')
+    ('0 * * * *', 'osugraphs.load_data.load_user_data_points')
 ]
 
 
