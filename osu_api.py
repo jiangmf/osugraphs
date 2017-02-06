@@ -1,4 +1,4 @@
-import requests, json
+import requests, json, time
 from bs4 import BeautifulSoup
 from collections import OrderedDict
 from osugraphs.models import User, DataPoint, Score, MapInfo

@@ -36,7 +36,7 @@ SHELL_PLUS_PRE_IMPORTS = (
 )
 
 CRONJOBS = [
-    ('0 * * * *', 'osugraphs.cron.my_scheduled_job')
+    ('0 * * * *', 'osugraphs.load_data.load_user_datapoints')
 ]
 
 
@@ -51,7 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_extensions',
-    # 'django_crontab',
+    'django_crontab',
     'debug_toolbar',
     'osugraphs',
 )
