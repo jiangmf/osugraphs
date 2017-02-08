@@ -58,19 +58,19 @@ def profile_view(request, context={}, profile_id=None):
 
 
     for score in score_set:
-        if "HD" in str(score.mods) and count_hd < 10:
+        if "HD" in str(score.mods):# and count_hd < 10:
             performance_hd = performance_hd + score.pp * pow(0.95, count_hd)
             count_hd += 1
             # print("HD", performance_hd)
-        if "HR" in str(score.mods) and count_hr < 10:
+        if "HR" in str(score.mods):# and count_hr < 10:
             performance_hr = performance_hr + score.pp * pow(0.95, count_hr)
             count_hr += 1
             # print("HR", performance_hr)
-        if ("DT" in str(score.mods) or "NC" in str(score.mods)) and count_dt < 10:
+        if ("DT" in str(score.mods) or "NC" in str(score.mods)):# and count_dt < 10:
             performance_dt = performance_dt + score.pp * pow(0.95, count_dt)
             count_dt += 1
             # print("DT", performance_dt)
-        if "None" in str(score.mods) and count_nomod < 10:
+        if "None" in str(score.mods):# and count_nomod < 10:
             performance_nomod = performance_nomod + score.pp * pow(0.95, count_nomod)
             count_nomod += 1
             # print("NOMOD", performance_nomod)

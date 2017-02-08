@@ -62,13 +62,18 @@ class OsuAPI(object):
     def get_mod_combination(self, mod):
         if mod == 0:
             return ["None"]
-        elif mod == 576:
-            return ["NC"]
 
         ret = []
         for k, v in MODS.items():
             if mod & v:
                 ret.append(k)
+
+        if "NC" in ret:
+            print("HAS NIGHT CORE")
+            try:
+                ret.remove("DT")
+            except ValueError:
+                pass
 
         return ret
     

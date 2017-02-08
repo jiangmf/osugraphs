@@ -61,13 +61,14 @@ def load_user_scores(user_id=None):
                     score_obj.date.hour   == score['date'].hour   and
                     score_obj.date.minute == score['date'].minute and
                     score_obj.date.second == score['date'].second) :
-                    # print("SKIPPED CREATING SCORE")
+                    # print(score['pp'], " SKIPPED CREATING SCORE ",map_info.title)
+
                     continue
                 else:
                     Score.objects.filter(pk=score_obj.pk).update(**score)
-                    score_obj.save()
-                    # print("UPDATED SCORE")
+                    # print(score['pp'], "UPDATED SCORE ", map_info.title)
             except Score.DoesNotExist:
+                # print(score['pp'], "CREATING SCORE ", map_info.title)
                 Score.objects.create(**score)
 
 def load_beatmap_data(since=None, beatmap_id=None):

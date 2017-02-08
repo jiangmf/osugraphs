@@ -52,6 +52,13 @@ def get_mod_combination(mod):
             if mod & v:
                 ret.append(k)
 
+        if "NC" in ret:
+            print("HAS NIGHT CORE")
+            try:
+                ret.remove("DT")
+            except ValueError:
+                pass
+                
         return ret
 
 class User(models.Model):
